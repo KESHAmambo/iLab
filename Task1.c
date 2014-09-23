@@ -1,50 +1,65 @@
 #include <stdio.h>
 #include <math.h>
+
 int main(void) {
-double a=0, b=0, c=0;
+double a = 0, b = 0, c = 0;
+double x1 = 0, x2 = 0;
+double m;
 printf("Please, enter coefficients a, b and c for quadratic equation");
-scanf("%lg %lg %lg",&a,&b,&c);
-if(b==0 && a==0){
-    if(c==0)
-        printf("x- any real number");
-    else
-        printf("no solutions");
-}
-else if(a==0){
-    double x=-c/b;
-    printf("%lg",x);
-}
-else if(b==0){
-    if(c<0){
-        double x=sqtr(-c/a);
-        double y=-x;
-        printf("two solutions: %lg and %lg",x,y);
-    }
-    else if(c==0){
-        double x=0;
-        printf("one solution: %lg",x);
-    }
-    else
-        printf"no solutions");
-}
-else if(c==0){
-    double x=-b/a;
-    double y=0;
-    printf("two solutions: %lg and %lg",x,y);
-else{
-    double d=b*b-4*a*c;
-    if(d>0){
-        double x=(-b+sqrt(d))/(2*a);
-        double y=(-b+sqrt(d))/(2*a);
-        printf("two solutions: %lg and %lg",x,y);
-    }
-    else if(d==0){
-        double x=-b/(2*a);
-        printf("one solution: %lg",x);
-    }
-    else
-    printf("no solutions");
+scanf("%lg %lg %lg", &a, &b, &c);
+m = solve(a, b, c, &x1, &x2);
+if (m == 2)
+    printf("Solutions: %lg and %lg.", x1, x2);
+else if (m == 1)
+    printf("One solution: %lg.", x1);
+else if (m == 0)
+    printf("X - any real number");
+else (m == -1)
+    printf("No solution"); 
+return 0;
 }
 
-  return 0;
+double solve(double a, double b, double c, double *x1, double *x2) { 
+if(b==0 && a==0) {
+    if(c==0)
+        return 0;
+    else
+        return -1;
+}
+else if (a==0) {
+    *x1 = -c / b;
+    return 1;
+}
+else if (b==0) {
+    if (c<0) {
+        *x1 = sqtr(-c / a);
+        *x2 = -sqrt(-c / a);
+        return 2;
+    }
+    else if (c==0) {
+        *x1 = 0;
+        return 1;
+    }
+    else
+        return -1;
+}
+else if(c==0) {
+    *x1 = -b / a;
+    *x2 = 0;
+    return 2;
+}
+else{
+    double d = b*b - 4*a*c;
+    if (d > 0) {
+        *x1 = (-b + sqrt(d)) / (2 * a);
+        *x2 = (-b - sqrt(d)) / (2 * a);
+        return 2;
+    }
+    else if(d==0) {
+        *x1 = -b / (2 * a);
+        return 1;
+    }
+    else
+        return -1;
+}
 }
