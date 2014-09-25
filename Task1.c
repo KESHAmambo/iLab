@@ -1,13 +1,14 @@
 #include <stdio.h>
 #include <math.h>
-
 int main(void) {
 double a = 0, b = 0, c = 0;
 double x1 = 0, x2 = 0;
-double m;
 printf("Please, enter coefficients a, b and c for quadratic equation");
 scanf("%lg %lg %lg", &a, &b, &c);
-m = solve(a, b, c, &x1, &x2);
+solOut(x1, x2, solve(a, b, c, &x1, &x2));
+}
+
+void solOut(double x1, double x2, int m) {
 if (m == 2)
     printf("Solutions: %lg and %lg.", x1, x2);
 else if (m == 1)
@@ -16,10 +17,9 @@ else if (m == 0)
     printf("X - any real number");
 else (m == -1)
     printf("No solution"); 
-return 0;
 }
 
-double solve(double a, double b, double c, double *x1, double *x2) { 
+double solve(double a, double b, double c, double *x1, double *x2){ 
 if(b==0 && a==0) {
     if(c==0)
         return 0;
@@ -27,7 +27,7 @@ if(b==0 && a==0) {
         return -1;
 }
 else if (a==0) {
-    *x1 = -c / b;
+    *x1 = -c/b;
     return 1;
 }
 else if (b==0) {
@@ -44,7 +44,7 @@ else if (b==0) {
         return -1;
 }
 else if(c==0) {
-    *x1 = -b / a;
+    *x1 = -b/a;
     *x2 = 0;
     return 2;
 }
