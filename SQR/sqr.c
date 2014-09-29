@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <math.h>
-#include "sqr.h"
+#include "functions.h"
 
 int main() {
     double a = 0, b = 0, c = 0;
