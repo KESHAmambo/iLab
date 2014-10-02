@@ -1,4 +1,4 @@
-#include "sqr.h"
+#include "functions.h"
 
 void solOut(double x1, double x2, int m) {
 if (m == 2)
