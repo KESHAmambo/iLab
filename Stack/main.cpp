@@ -13,7 +13,6 @@ int main()
     stack->next = NULL;
     stack->number = 1;
 
-    stack = push(stack, 111);
     stack = push(stack, 222);
     stack = push(stack, 333);
     stack = push(stack, 444);
