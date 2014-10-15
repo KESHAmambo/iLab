@@ -30,6 +30,11 @@ int main()
     printf_s("After deleting:\n");
     printf_s("%d\n", pop(stack));
     printf_s("%d\n", getCount(stack));
+ 
+    stack = DeleteAll(stack);
+    if (isEmpty(stack))
+        printf_s("Stack is NULL after ''DeleteAll''.\n");
+
     getchar();
     return 0;
 }
