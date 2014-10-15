@@ -4,20 +4,14 @@
 
 struct List
 {
-    int value;
-    struct List* next;
-    int number;
-
-    List* push(List* stack, int i);
-    int pop(List* stack);
-    int getCount(List* stack);
-    bool isEmpty(List* stack);
-    List* Delete(List* stack);
-
+ int value;
+ struct List* next;
+ int number;
 };
 
 List* push(List* stack, int i);
-int pop(List* stack);
 int getCount(List* stack);
 bool isEmpty(List* stack);
 List* Delete(List* stack);
+int pop(List** stack);
+List* DeleteAll(List* stack);
