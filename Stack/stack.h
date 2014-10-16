@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifndef stack_h
+#define stack_h
+
 struct List
 {
     int value;
@@ -15,3 +18,6 @@ struct List
     List* Delete(List* stack);
     int pop(List** stack);
     List* DeleteAll(List* stack);
+
+#endif
+
