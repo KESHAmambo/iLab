@@ -22,13 +22,13 @@ int main()
     else
     {
         printf_s("We added some elements and now stack isn't empty:\n");
-        printf_s("%d\n", pop(stack));
+        printf_s("%d\n", pop(&stack));
         printf_s("%d\n", getCount(stack));
     }
 
     stack = Delete(stack);
     printf_s("After deleting:\n");
-    printf_s("%d\n", pop(stack));
+    printf_s("%d\n", pop(&stack));
     printf_s("%d\n", getCount(stack));
  
     stack = DeleteAll(stack);
