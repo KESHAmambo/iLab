@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "stack.h"
-
+#include "functions.h"
 
 int main()
 {
