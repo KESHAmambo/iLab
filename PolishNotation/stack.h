@@ -21,8 +21,4 @@ public:
 
 struct mystackval;
 
-int inttoc(char c);
-int power(int a, int b);
-
-
 #endif
