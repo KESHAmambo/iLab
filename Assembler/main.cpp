@@ -33,20 +33,20 @@ int main()
 		s1[i] = simbol;
 	}
 
-	/*printf("Enter the name of file where you want to put binary code:\n");
+	printf("Enter the name of file where you want to put binary code:\n");
 	for (i = 0; i < 100; i++)
 	{
 		simbol = getchar();
 		if (simbol == '\n')
 			break;
 		s2[i] = simbol;
-	}*/
+	}
 
 	FILE *fout;
 	FILE *fin;
 
 	fout = fopen(s1, "r");
-	fin = fopen(s2, "a");
+	fin = fopen(s2, "w");
 
 	struct List* stack = NULL;
 	stack = (struct List*)calloc(1, sizeof(struct List));
@@ -109,7 +109,7 @@ int main()
 			break;
 		}
 
-		printf("%d ", bincode);
+		fprintf(fin, "%d ", bincode);
 
 		if (bincode == 311 || bincode == 511)
 		{
@@ -129,10 +129,10 @@ int main()
 				bincode = bincode + inttoc(pop(&stackV)) * power(10, stackV->number - 1);
 			}
 
-			printf("%d", bincode);
+			fprintf(fin, "%d", bincode);
 		}
 		bincode = 0;
-		printf("\n");
+		fprintf(fin, "\n");
 
 		while (stackR->value == 32 || stackR->value == 10 && stackR->value != 3333)
 			pop(&stackR);
