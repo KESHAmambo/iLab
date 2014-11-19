@@ -6,15 +6,30 @@
 "push"  to 311 with value
 "pop"   to 322
 "print" to 411
-"mov"   to 511 with value
-"jump"  to 611
+"mov"   to 511 with variable and variable or value (variables are 'A' and 'B')
+"jump"  to 611 with value
+
 */
+
 #include "stdafx.h"
 #include "string.h"
 #include "stack.h"
 
+
+struct Arr
+{
+	int com;
+	int val1;
+	int val2;
+};
+
 int main()
 {
+	
+	
+	Arr* p;
+	p = (struct Arr*)calloc(1, sizeof(struct Arr));
+
 	char s1[100] = ""; // file name, where you get binary code
 	char simbol = 0;
 	int i = 0;
@@ -31,6 +46,14 @@ int main()
 	
 	fout = fopen(s1, "r");
 	
+	int A = 0;     // variable of processor
+	int B = 0;	   // variable of processor
+	int minuend = 0; // for sub
+	int subtrahend = 0; // for sub
+	int command = 0;
+	int val = 0;
+	int result = 0;
+	int loc = 0;
 
 	struct List* stack = NULL;
 	stack = (struct List*)calloc(1, sizeof(struct List));
@@ -38,47 +61,93 @@ int main()
 	stack->next = NULL;
 	stack->number = 1;
 
-	int command = 0;
-	int result = 0;
+	i = 0;
 	while (fscanf(fout, "%d", &command) != EOF)
 	{
-		switch (command)
+		p[i].com = command;
+		if (command == 311 || command == 611)
+		{
+			fscanf(fout, "%d", &val);
+			p[i].val1 = val;
+		}
+		if (command == 511)
+		{
+			fscanf(fout, "%d", &val);
+			p[i].val1 = val;
+			fscanf(fout, "%d", &val);
+			p[i].val2 = val;
+		}
+		i++;
+	}
+	int END = i;
+	i = 0;
+	
+	while (i < END)
+	{
+		switch (p[i].com)
 		{
 		case 111:
 			result = 0;
 			result = pop(&stack) + pop(&stack);
 			stack = push(stack, result);
+			i++;
 			break;
 		case 122:
 			result = 0;
-			result = pop(&stack) - pop(&stack);
+			minuend = pop(&stack);
+			subtrahend = pop(&stack);
+			result = subtrahend - minuend;
 			stack = push(stack, result);
+			i++;
 			break;
 		case 211:
 			result = 0;
 			result = pop(&stack) * pop(&stack);
 			stack = push(stack, result);
+			i++;
 			break;
 		case 222:
 			result = 0;
 			result = pop(&stack) / pop(&stack);
 			stack = push(stack, result);
+			i++;
 			break;
 		case 311:
-			fscanf(fout, "%d", &command);
-			stack = push(stack, command);
+			loc = p[i].val1;
+			stack = push(stack, loc);
+			i++;
 			break;
 		case 322:
-			printf("%d", pop(&stack));
+			printf("%d\n", pop(&stack));
+			i++;
 			break;
 		case 411:
-			printf("%d", stack->value);
+			printf("%d\n", stack->value);
+			i++;
 			break;
 		case 511:
+			if (p[i].val1 == 'A')
+			{
+				if (p[i].val2 == 'B')
+					A = B;
+				else
+					A = p[i].val2;
+			}
+			if (p[i].val1 == 'B')
+			{
+				if (p[i].val2 == 'A')
+					B = A;
+				else
+					B = p[i].val2;
+			}
+			i++;
 			break;
 		case 611:
-			rewind(fout);
+			val = p[i].val1 - 1;
+			i = val;
+			break;
 		}
 	}
-	getchar();
+
+	getchar(); 
 }
