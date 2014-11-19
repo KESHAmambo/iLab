@@ -6,8 +6,8 @@
 "push"  to 311 with value
 "pop"   to 322
 "print" to 411
-"mov"   to 511 with value
-"jump"  to 611
+"mov"   to 511 with variable and variable or value (variables are 'A' and 'B')
+"jump"  to 611 with value
 */
 
 #include "stdafx.h"
@@ -110,13 +110,13 @@ int main()
 		}
 
 		fprintf(fin, "%d ", bincode);
+		
 
-		if (bincode == 311 || bincode == 511)
+		if (bincode == 311 || bincode == 611)
 		{
-			bincode = 0;
-			while (stackR->value == 32 || stackR->value == 10 && stackR->value != 3333) // char ' ' = int 32, char '\n' = int 10
+			bincode = 0; // must be here
+			while (stackR->value == 32 || stackR->value == 10 && stackR->value != 3333) // char ' ' = int 32, char '\n' = int 10 ------ deleting extra spaces and hyphens
 				pop(&stackR);
-
 
 			while (stackR->value != 10 && stackR->value != 32 && stackR->value != 3333)
 				stack = push(stack, pop(&stackR));
@@ -130,6 +130,52 @@ int main()
 			}
 
 			fprintf(fin, "%d", bincode);
+		}
+
+		if (bincode == 511)
+		{
+			bincode = 0; // must be here
+			while (stackR->value == 32 || stackR->value == 10 && stackR->value != 3333) // char ' ' = int 32, char '\n' = int 10    
+				pop(&stackR);
+
+			if (stackR->value == 3333)
+			{
+				printf("There are no variables after 'mov' in the original file");
+				break;
+			}
+
+			fprintf(fin, "%d ", pop(&stackR));
+
+			while (stackR->value == 32 || stackR->value == 10 && stackR->value != 3333) // char ' ' = int 32, char '\n' = int 10
+				pop(&stackR);
+
+			if (stackR->value == 3333)
+			{
+				printf("There are no variables after 'mov' in the original file");
+				break;
+			}
+
+			if (stackR->value == 'A' || stackR->value == 'B')
+			{
+				fprintf(fin, "%d", pop(&stackR));
+			}
+			
+			else
+			{
+				while (stackR->value != 10 && stackR->value != 32 && stackR->value != 3333)
+					stack = push(stack, pop(&stackR));
+
+				while (stack->number != 1)
+					stackV = push(stackV, pop(&stack));
+
+				while (stackV->number != 1)
+				{
+					bincode = bincode + inttoc(pop(&stackV)) * power(10, stackV->number - 1);
+				}
+
+				fprintf(fin, "%d", bincode);
+			}
+
 		}
 		bincode = 0;
 		fprintf(fin, "\n");
