@@ -7,22 +7,45 @@
 "pop"   to 322
 "print" to 411
 "mov"   to 511 with variable and variable or value (variables are 'A' and 'B')
-"jump"  to 611 with value
+"jump"  to 611 with label
+"pushA" to 312
+"pushB" to 313
+"popA"  to 323
+"popB"  to 324
+"jne"   to 622 with label
+"je"    to 633 with label
+"je"    to 644 with label
+"jl"    to 655 with label
+"label" to 711 with its name
+"cmp"   to 811
 */
 
 #include "stdafx.h"
 #include <string.h>
 #include "stack.h"
 
+struct Label
+{
+	char name[100];
+	int number;
+};
+
 int main()
 {
 	
 	char s1[100] = ""; //"FileOut.txt"; // file name, which binary code you want to get
 	char s2[100] = ""; //"FileIn.txt"; // file name, where you want to put the resulting binary code
-	char command[20] = ""; // command name, that we took from out-file
+	char command[20] = ""; // command name, that we take from out-file
 	char simbol = 0;
-
+	char labName[100] = "";
 	int i = 0;
+	int labCount = 0;
+	int j = 0;
+	int labcheck = 0;
+
+	Label* p;
+	int size_c = 100;
+	p = (struct Label*)calloc(size_c, sizeof(struct Label));
 
 	printf("Enter the name of original file:\n");
 	for (i = 0; i < 100; i++)
@@ -86,82 +109,65 @@ int main()
 		while (stackR->value != 10 && stackR->value != 32 && stackR->value != 3333)  // stackR - has all elements of original file
 			stack = push(stack, pop(&stackR));				
 
-		while (stack->number != 1)
-			stackV = push(stackV, pop(&stack));  // there is first command in the stackV
-
-		elstack = stackV->number;
-
-		for (i = 0; i < elstack - 1; i++)
+		if (stack->value == ':')            // if we found label
 		{
-			command[i] = pop(&stackV);
-		}
-
-		bincode = wordsToInt(command);
-
-		for (i = 0; i < elstack - 1; i++)
-		{
-			command[i] = 0;
-		}
-
-		if (bincode == 0)
-		{
-			printf("Error in the algorithm presented in the original file.\n");
-			break;
-		}
-
-		fprintf(fin, "%d ", bincode);
-		
-
-		if (bincode == 311 || bincode == 611)
-		{
-			bincode = 0; // must be here
-			while (stackR->value == 32 || stackR->value == 10 && stackR->value != 3333) // char ' ' = int 32, char '\n' = int 10 ------ deleting extra spaces and hyphens
-				pop(&stackR);
-
-			while (stackR->value != 10 && stackR->value != 32 && stackR->value != 3333)
-				stack = push(stack, pop(&stackR));
-
+			pop(&stack);
 			while (stack->number != 1)
 				stackV = push(stackV, pop(&stack));
 
+			i = 0;
 			while (stackV->number != 1)
 			{
-				bincode = bincode + inttoc(pop(&stackV)) * power(10, stackV->number - 1);
+				p[labCount].name[i] = pop(&stackV);
+				i++;
 			}
+			p[labCount].number = labCount;
+			fprintf(fin, "711 %d\n", p[labCount].number);
+			labCount++;
 
-			fprintf(fin, "%d", bincode);
+			if (labCount == size_c - 1)
+			{
+				size_c = size_c + 10;
+				realloc(p, size_c);
+			}
+			while (stackR->value == 32 || stackR->value == 10 && stackR->value != 3333)
+				pop(&stackR);
 		}
 
-		if (bincode == 511)
+		else
 		{
-			bincode = 0; // must be here
-			while (stackR->value == 32 || stackR->value == 10 && stackR->value != 3333) // char ' ' = int 32, char '\n' = int 10    
-				pop(&stackR);
+			while (stack->number != 1)
+				stackV = push(stackV, pop(&stack));  // there is first command in the stackV
 
-			if (stackR->value == 3333)
+			elstack = stackV->number;
+
+			for (i = 0; i < elstack - 1; i++)
 			{
-				printf("There are no variables after 'mov' in the original file");
+				command[i] = pop(&stackV);
+			}
+
+			bincode = wordsToInt(command);
+
+			for (i = 0; i < elstack - 1; i++)
+			{
+				command[i] = 0;
+			}
+
+			if (bincode == 0)
+			{
+				printf("Error in the algorithm presented in the original file.\n");
 				break;
 			}
 
-			fprintf(fin, "%d ", pop(&stackR));
+			fprintf(fin, "%d ", bincode);
 
-			while (stackR->value == 32 || stackR->value == 10 && stackR->value != 3333) // char ' ' = int 32, char '\n' = int 10
-				pop(&stackR);
 
-			if (stackR->value == 3333)
+			if (bincode == 311)
 			{
-				printf("There are no variables after 'mov' in the original file");
-				break;
-			}
+				bincode = 0; // must be here
+				while (stackR->value == 32 || stackR->value == 10 && stackR->value != 3333) // char ' ' = int 32, char '\n' = int 10 ------ deleting extra spaces and hyphens
+					pop(&stackR);
 
-			if (stackR->value == 'A' || stackR->value == 'B')
-			{
-				fprintf(fin, "%d", pop(&stackR));
-			}
-			
-			else
-			{
 				while (stackR->value != 10 && stackR->value != 32 && stackR->value != 3333)
 					stack = push(stack, pop(&stackR));
 
@@ -176,13 +182,100 @@ int main()
 				fprintf(fin, "%d", bincode);
 			}
 
-		}
-		bincode = 0;
-		fprintf(fin, "\n");
+			if (bincode == 511)
+			{
+				bincode = 0; // must be here
+				while (stackR->value == 32 || stackR->value == 10 && stackR->value != 3333) // char ' ' = int 32, char '\n' = int 10    
+					pop(&stackR);
 
-		while (stackR->value == 32 || stackR->value == 10 && stackR->value != 3333)
-			pop(&stackR);
+				if (stackR->value == 3333)
+				{
+					printf("There are no variables after 'mov' in the original file");
+					break;
+				}
+
+				fprintf(fin, "%c ", pop(&stackR));
+
+				while (stackR->value == 32 || stackR->value == 10 && stackR->value != 3333) // char ' ' = int 32, char '\n' = int 10
+					pop(&stackR);
+
+				if (stackR->value == 3333)
+				{
+					printf("There are no variables after 'mov' in the original file");
+					break;
+				}
+
+				if (stackR->value == 'A' || stackR->value == 'B')
+				{
+					fprintf(fin, "%c", pop(&stackR));
+				}
+
+				else
+				{
+					while (stackR->value != 10 && stackR->value != 32 && stackR->value != 3333)
+						stack = push(stack, pop(&stackR));
+
+					while (stack->number != 1)
+						stackV = push(stackV, pop(&stack));
+
+					while (stackV->number != 1)
+					{
+						bincode = bincode + inttoc(pop(&stackV)) * power(10, stackV->number - 1);
+					}
+
+					fprintf(fin, "%d", bincode);
+				}
+
+			}
+
+			if (bincode == 611 || bincode == 622 || bincode == 633 || bincode == 644 || bincode == 655)
+			{
+				bincode = 0; // must be here
+				while (stackR->value == 32 || stackR->value == 10 && stackR->value != 3333) // char ' ' = int 32, char '\n' = int 10 ------ deleting extra spaces and hyphens
+					pop(&stackR);
+
+				while (stackR->value != 10 && stackR->value != 32 && stackR->value != 3333)
+					stack = push(stack, pop(&stackR));
+
+				while (stack->number != 1)
+					stackV = push(stackV, pop(&stack));
+
+				i = 0;
+				while (stackV->number != 1)
+				{
+					labName[i] = pop(&stackV);
+					i++;
+				}
+				
+				for (i = 0; i < labCount; i++)
+				{
+					labcheck = 0;
+					for (j = 0; j < 100; j++)
+					{
+						if (labName[j] != p[i].name[j])
+						{
+							labcheck = 1;
+						}
+					}
+					if (labcheck == 0)
+					{
+						fprintf(fin, "%d", i);
+						break;
+					}
+				}
+				
+				for (i = 0; i < 100; i++)
+					labName[i] = 0;
+			}
+			bincode = 0;
+			fprintf(fin, "\n");
+
+			while (stackR->value == 32 || stackR->value == 10 && stackR->value != 3333)
+				pop(&stackR);
+		}
 	}
+
+	printf("Assambler's work finished.\n");
 	getchar();
 	return 0;
 }
