@@ -65,8 +65,8 @@ List* DeleteAll(List* stack)
 }
 
 int inttoc(char c)
-{ 
-        return (c - '0')
+{
+	return (c - '0');
 }
 
 char add[20] = "add";
@@ -78,6 +78,15 @@ char popa[20] = "pop";
 char print[20] = "print";
 char mov[20] = "mov";
 char jump[20] = "jump";
+char pushA[20] = "pushA";
+char pushB[20] = "pushB";
+char popA[20] = "popA";
+char popB[20] = "popB";
+char jne[20] = "jne";
+char je[20] = "je";
+char jg[20] = "jg";
+char jl[20] = "jl";
+char cmp[20] = "cmp";
 
 int wordsToInt(char* w)
 {
@@ -163,6 +172,87 @@ int wordsToInt(char* w)
 	}
 	if (check == 0)
 		return 611;
+
+	check = 0;
+	for (i = 0; i < 20; i++)
+	{
+		if (w[i] != pushA[i])
+			check = 1;
+	}
+	if (check == 0)
+		return 312;
+
+	check = 0;
+	for (i = 0; i < 20; i++)
+	{
+		if (w[i] != pushB[i])
+			check = 1;
+	}
+	if (check == 0)
+		return 313;
+
+	check = 0;
+	for (i = 0; i < 20; i++)
+	{
+		if (w[i] != popA[i])
+			check = 1;
+	}
+	if (check == 0)
+		return 323;
+
+	check = 0;
+	for (i = 0; i < 20; i++)
+	{
+		if (w[i] != popB[i])
+			check = 1;
+	}
+	if (check == 0)
+		return 324;
+
+	check = 0;
+	for (i = 0; i < 20; i++)
+	{
+		if (w[i] != jne[i])
+			check = 1;
+	}
+	if (check == 0)
+		return 622;
+
+	check = 0;
+	for (i = 0; i < 20; i++)
+	{
+		if (w[i] != je[i])
+			check = 1;
+	}
+	if (check == 0)
+		return 633;
+
+	check = 0;
+	for (i = 0; i < 20; i++)
+	{
+		if (w[i] != jg[i])
+			check = 1;
+	}
+	if (check == 0)
+		return 644;
+
+	check = 0;
+	for (i = 0; i < 20; i++)
+	{
+		if (w[i] != jl[i])
+			check = 1;
+	}
+	if (check == 0)
+		return 655;
+
+	check = 0;
+	for (i = 0; i < 20; i++)
+	{
+		if (w[i] != cmp[i])
+			check = 1;
+	}
+	if (check == 0)
+		return 811;
 
 	return 0;
 }
