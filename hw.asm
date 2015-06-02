@@ -1,201 +1,132 @@
 .686
 .model flat
 
-global main
-extern fread
-extern fwrite
-extern stdin
-extern stdout
-extern putchar
-extern printf
-extern strlen
-extern isupper
-extern toupper
+includelib C:\Users\TEMP.blastfox.000\Desktop\MASM120\LIB\msvcrt.lib
 
-%define MAX_TEXT_SIZE 100
+gets proto c
+puts proto c
+strlen proto c
+printf proto c
 
-section .text
+.data
+msg db 100 dup(?)
+msg1  db 100 dup(?)
+.code
 
-main:
+_main:
+	push 	offset msg
+	call 	gets
+	add 	esp, 4
 
-; read input into the buffer
-push dword [stdin]
-push MAX_TEXT_SIZE
-push 1
-push input
-call fread
-add esp, 16;
+	push 	offset msg1
+	pop	  esi
+	
+	
+	push 	offset msg
+	call 	strlen
+	add 	esp, 4
+	
+	dec	  eax
+	
+	mov 	bl, msg[eax]
+	cmp 	bl, 'A'
+	jb  	r2
+	cmp  	bl, 'Z'
+	ja  	r2
+	
+	mov 	ecx, eax
+	
+compare:
+	dec 	ecx
+	cmp 	msg[ecx], bl
+	je  	r2
+	cmp 	ecx,0
+	ja 	  compare
+	push 	offset msg
+	call 	RULE_1_4
+	add 	esp, 4
+	
+	jmp 	ending                                                                                         
+	
+r2:	
+	push 	offset msg
+	call 	RULE_2_6
+	add 	esp, 4
+	jmp 	ending
 
-mov byte [input+eax], 0
+	
+RULE_1_4 proc
+	push	ebp
+	mov 	ebp, esp
+	mov	  ecx, 0
+	mov	  ebx, [ebp + 8]
 
-push input
-call strlen
-add esp, 4
-mov [input_size], eax
+cycle1:	
+	cmp	  [ebx+ecx], 0
+	je	  ret1
+	cmp	  [ebx+ecx], 'a'
+	jb 	  exchange
+	cmp	  [ebx+ecx], 'z'
+	ja   	exchange
+	sub	  [ebx+ecx], 32
+	inc	  ecx
+	jmp	  cycle1
+	
+	
+exchange:
+	inc	  ecx
+	jmp	  cycle1
+	
+ret1:
+	RULE_1_4 endp
+	push  offset msg
+	call 	puts
+	add   esp, 4
+	mov  	esp, ebp
+	pop	  ebp
+	jmp   ending
 
-; prepare variables for the rule, while at it
-mov dword [output_ptr], input
-mov dword [output_size], eax
+	
+	
+RULE_2_6	proc
+	push	ebp
+	mov	  ebp,esp
+	mov 	edx, [ebp + 8]
+	xor	  ecx, ecx 
 
-push dword [stdout]
-push eax
-push 1
-push input
-call fwrite
-add esp, 16
-
-push 0x0A
-call putchar
-add esp, 4
-
-call dword [property_1]
-
-mov eax, [rule_1_4]
-mov ebx, [rule_2_6]
-cmovnc eax, ebx;
-call eax
-
-push eax
-push rule_fmt
-call printf
-add esp, 8
-
-; write back the output
-push dword [stdout]
-push dword [output_size]
-push 1
-push dword [output_ptr]
-call fwrite
-add esp, 16
-
-push 0x0A
-call putchar
-add esp, 4
-
-normal_exit:
-
-xor eax, eax
-ret
-
-error_exit:
-
-mov eax, 1
-ret
-
-true_ret:
-
-stc
-ret
-
-false_ret:
-
-clc
-ret
-
-
-property_1:
-
-mov ebx, input
-add ebx, dword [input_size]
-dec ebx
-
-movzx eax, byte [ebx];
-push eax
-call isupper
-add esp, 4
-test eax, eax
-jz false_ret
-
-; check for other occurrences
-mov esi, input
-mov ecx, [input_size]
-dec ecx
-mov al, byte [ebx]
-repne scasb
-je false_ret
-
-jmp true_ret
-
-
-rule_1_0:
-
-mov eax, rule_1_0_desc
-ret
+	
+	mov 	bl, [edx]
+	mov 	[esi], bl
+	
+	mov 	al, [edx+eax]
+	cmp 	bl, al
+	jne 	cycle2
+	dec 	eax
+	
+cycle2: 
+	inc 	ecx
+	mov 	bl, [edx+ecx]
+	cmp 	bl, [esi]
+	je  	cycle2 
+	add 	esi, 1
+	mov 	[esi], bl
+	
+	cmp 	ecx, eax 
+	jne 	cycle2
+	
+	push 	offset msg1
+	call	puts
+	add 	esp,4
+	mov	  esp,ebp
+	pop 	ebp
 
 
-rule_2_0:
 
-mov eax, rule_2_0_desc
-ret
+RULE_2_6	endp
+	
 
-
-rule_1_4:
-
-mov esi, input
-
-.processing_loop:
-xor eax, eax
-lodsb
-
-test eax, eax
-jz .exit
-
-push eax
-call toupper
-add esp, 4
-mov byte [esi-1], al
-
-jmp .processing_loop
-
-.exit:
-mov eax, rule_1_4_desc
-ret
-
-
-rule_2_6:
-
-mov esi, input
-mov edi, input
-xor ebx, ebx
-
-.processing_loop:
-xor eax, eax
-lodsb
-
-test eax, eax
-jz .exit
-
-cmp eax, ebx
-je .skip
-
-stosb
-
-.skip:
-mov ebx, eax
-jmp .processing_loop
-
-.exit:
-sub edi, input
-mov dword [output_size], edi
-mov eax, rule_2_6_desc
-ret
-
-
-section .bss
-
-input_size resd 1
-output_size resd 1
-input resb MAX_TEXT_SIZE + 1
-output resb MAX_TEXT_SIZE * 2 + 1
-
-
-section .data
-
-rule_fmt db "Rule applied: '%s'.", 0x0A, 0
-
-rule_1_0_desc db "The property is fulfilled", 0
-rule_1_4_desc db "Each lower-case letter is replaced with a corresponding upper-case letter", 0
-rule_2_0_desc db "The property is NOT fulfilled", 0
-rule_2_6_desc db "All characters equal to the previous one are removed", 0
-
-output_ptr dd input
+ending:	
+	xor 	eax,eax
+	ret 	0
+	
+end _main
